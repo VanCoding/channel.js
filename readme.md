@@ -7,6 +7,27 @@ A simple node.js module, that allows you to channel multiple streams over anothe
 - one channel cannot block the other chnalles by writing huge Buffers, they get splitted to user defined chunks
 - as small overhead as possible (4bytes per 4096bytes of data)
 
+
+###Example
+    var net = require("net");
+    var channeler = require("./index.js");    
+    
+    net.createServer(function(c){
+        c = new channeler(c); //setup channeler
+        c.createChannel().end("Hello"); //open 2 channels and write to them
+        c.createChannel().end("World");
+        
+    }).listen(80);
+    
+    var c = net.connect(80,function(){
+    	c = new channeler(c); //setup channeler
+    	c.on("channel",function(ch){ //listen for channels
+    		ch.on("data",function(d){ //listen for data
+    			console.log("channel "+ch.id+": "+d.toString());
+    		});
+    	});
+    });
+
 ###API
 ####Loading the module
 `var channeler = require("channel.js");`
